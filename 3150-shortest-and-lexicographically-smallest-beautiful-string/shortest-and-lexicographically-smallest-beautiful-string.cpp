@@ -1,29 +1,39 @@
 class Solution {
 public:
     string shortestBeautifulSubstring(string s, int k) {
-     int n = s.size();
-        vector<int> onesIdx;
-        for (int i = 0; i < n; i++)
-            if (s[i] == '1') onesIdx.push_back(i);
+        int n = s.size();
 
-        if ((int)onesIdx.size() < k) return "";
+        int left = 0;
+        int ones = 0;
 
-        int minLen = INT_MAX;
-        for (int i = 0; i + k - 1 < (int)onesIdx.size(); i++) {
-            int length = onesIdx[i + k - 1] - onesIdx[i] + 1;
-            minLen = min(minLen, length);
-        }
-        string best = "";
-        for (int i = 0; i + minLen <= n; i++) {
-            string sub = s.substr(i, minLen);
-            int cnt = count(sub.begin(), sub.end(), '1');
-            if (cnt == k) {
-                if (best.empty() || sub < best) {
-                    best = sub;
-                }
+        string ans = "";
+
+        for (int right = 0; right < n; right++) {
+
+            if (s[right] == '1')
+                ones++;
+
+            // Too many ones -> move left
+            while (ones > k) {
+                if (s[left] == '1')
+                    ones--;
+
+                left++;
             }
+
+            // We have exactly k ones
+           if (ones == k) {
+    while (left < right && s[left] == '0') left++;
+
+    int len = right - left + 1;
+    if (!ans.empty() && len > (int)ans.size()) continue; // skip pointless substr
+
+    string cur = s.substr(left, len);
+    if (ans.empty() || len < (int)ans.size() || (len == (int)ans.size() && cur < ans))
+        ans = cur;
+}
         }
 
-        return best;
+        return ans;
     }
 };
